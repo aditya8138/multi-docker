@@ -1,0 +1,26 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  # to make test version on project use dockerfile.dev
+  - docker build -t aditya8138/react-test -f ./client/Dockerfile.dev ./client
+
+# all scripts should exit with status 0 - then only travis build passes
+script:
+  - docker run aditya8138/react-test npm test -- --coverage # -- --coverage makes sure script exits tests
+
+after_success:
+  # build prod version of artifacts
+  - docker build -t aditya8138/multi-client ./client
+  - docker build -t aditya8138/multi-nginx ./nginx
+  - docker build -t aditya8138/multi-server ./server
+  - docker build -t aditya8138/multi-worker ./worker
+  # log in to docker-cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # push to dockerhub
+  - docker push aditya8138/multi-client
+  - docker push aditya8138/multi-nginx
+  - docker push aditya8138/multi-server
+  - docker push aditya8138/multi-worker
