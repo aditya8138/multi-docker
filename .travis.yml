@@ -9,7 +9,7 @@ before_install:
 
 # all scripts should exit with status 0 - then only travis build passes
 script:
-  - docker run aditya8138/react-test npm test -- --coverage # -- --coverage makes sure script exits tests
+  - docker run -e CI=true aditya8138/react-test npm test -- --coverage # -- --coverage makes sure script exits tests
 
 after_success:
   # build prod version of artifacts
